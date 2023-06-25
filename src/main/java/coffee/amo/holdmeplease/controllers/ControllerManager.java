@@ -7,12 +7,10 @@ import net.minecraftforge.common.MinecraftForge;
 
 import java.util.Map;
 
-public class MovementController {
+public class ControllerManager {
     private Player player;
     private Map<KeyMapping, DoubleTapController> DOUBLE_TAP_CONTROLLERS;
     private Map<KeyMapping, LongPressController> LONG_PRESS_CONTROLLERS;
-    private int dashCooldown = 0;
-    private static int DASH_COOLDOWN = 100;
 
     public void registerDoubleTapController(KeyMapping key, DoubleTapController controller) {
         DOUBLE_TAP_CONTROLLERS.put(key, controller);
@@ -32,14 +30,10 @@ public class MovementController {
 
     public void tick() {
         if(DOUBLE_TAP_CONTROLLERS == null) return;
-        for (DoubleTapController dashController : DOUBLE_TAP_CONTROLLERS.values()) {
-            if (dashController.hasStarted()) {
-                dashController.tick();
+        for (DoubleTapController tapController : DOUBLE_TAP_CONTROLLERS.values()) {
+            if (tapController.hasStarted()) {
+                tapController.tick();
             }
-        }
-        if (dashCooldown > 0) {
-            dashCooldown--;
-            System.out.println(dashCooldown);
         }
         if(LONG_PRESS_CONTROLLERS == null) return;
         for (LongPressController longPressController : LONG_PRESS_CONTROLLERS.values()) {
@@ -47,7 +41,7 @@ public class MovementController {
         }
     }
 
-    public MovementController() {
+    public ControllerManager() {
     }
 
     public Player getPlayer() {
@@ -63,15 +57,25 @@ public class MovementController {
     }
 
     public void reset() {
-        for (DoubleTapController dashController : DOUBLE_TAP_CONTROLLERS.values()) {
-            dashController.reset();
+        for (DoubleTapController tapController : DOUBLE_TAP_CONTROLLERS.values()) {
+            tapController.reset();
         }
     }
 
     private KeyMapping lastPressed = null;
 
     public void tap(KeyMapping key) {
+        if(DOUBLE_TAP_CONTROLLERS == null) return;
         DOUBLE_TAP_CONTROLLERS.get(key).tap();
+    }
+
+    public void tap(int key) {
+        if(DOUBLE_TAP_CONTROLLERS == null) return;
+        DOUBLE_TAP_CONTROLLERS.forEach((k, v) -> {
+            if (k.getKey().getValue() == key) {
+                tap(k);
+            }
+        });
     }
 
     public void press(KeyMapping key) {
@@ -79,9 +83,41 @@ public class MovementController {
         LONG_PRESS_CONTROLLERS.get(key).press();
     }
 
+    public void press(int key) {
+        if(LONG_PRESS_CONTROLLERS == null) return;
+        LONG_PRESS_CONTROLLERS.forEach((k, v) -> {
+            if (k.getKey().getValue() == key) {
+                press(k);
+            }
+        });
+    }
+
     public void release(KeyMapping key) {
         if(LONG_PRESS_CONTROLLERS == null) return;
         LONG_PRESS_CONTROLLERS.get(key).release();
     }
 
+    public void release(int key) {
+        if(LONG_PRESS_CONTROLLERS == null) return;
+        LONG_PRESS_CONTROLLERS.forEach((k, v) -> {
+            if (k.getKey().getValue() == key) {
+                release(k);
+            }
+        });
+    }
+
+
+    public void hold(int key) {
+        if(LONG_PRESS_CONTROLLERS == null) return;
+        LONG_PRESS_CONTROLLERS.forEach((k, v) -> {
+            if (k.getKey().getValue() == key) {
+                hold(k);
+            }
+        });
+    }
+
+    public void hold(KeyMapping key) {
+        if(LONG_PRESS_CONTROLLERS == null) return;
+        LONG_PRESS_CONTROLLERS.get(key).tick();
+    }
 }
