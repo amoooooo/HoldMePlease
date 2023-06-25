@@ -2,6 +2,7 @@ package coffee.amo.holdmeplease.controllers;
 
 import net.minecraft.client.KeyMapping;
 import net.minecraft.world.entity.player.Player;
+import org.checkerframework.checker.units.qual.A;
 
 import java.util.function.Consumer;
 
@@ -36,6 +37,7 @@ public class DoubleTapController {
         this.doubleTapAction = doubleTapAction;
         this.tickAction = tickAction;
         this.timeOutAction = timeOutAction;
+        tickData = new ActionData(player, doubleTapWindow, tapWindowDuration);
     }
 
     public void tick() {
@@ -78,6 +80,7 @@ public class DoubleTapController {
     public void reset() {
         doubleTapWindow = tapWindowDuration;
         wasDown = false;
+        tickData = new ActionData(player, doubleTapWindow, tapWindowDuration);
     }
 
     public KeyMapping getKey() {

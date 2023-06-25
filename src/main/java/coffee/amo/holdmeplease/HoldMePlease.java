@@ -51,7 +51,6 @@ public class HoldMePlease {
     public HoldMePlease() {
     }
 
-
     @Mod.EventBusSubscriber(modid = MODID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
     public static class ClientForgeEvents {
         @SubscribeEvent
@@ -73,8 +72,16 @@ public class HoldMePlease {
                 CONTROLLER_MANAGER.release(event.getKey());
                 CONTROLLER_MANAGER.tap(event.getKey());
             }
-            if(event.getAction() == InputConstants.REPEAT) {
-                CONTROLLER_MANAGER.hold(event.getKey());
+        }
+
+        @SubscribeEvent
+        public static void onMousePress(InputEvent.MouseButton.Post event){
+            if(event.getAction() == InputConstants.RELEASE) {
+                CONTROLLER_MANAGER.tap(event.getButton());
+                CONTROLLER_MANAGER.release(event.getButton());
+            }
+            if(event.getAction() == InputConstants.PRESS) {
+                CONTROLLER_MANAGER.press(event.getButton());
             }
         }
     }
